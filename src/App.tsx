@@ -43,13 +43,7 @@ export default function App() {
         return [];
       }
     }
-    return [
-      { id: '1', date: new Date('2024-03-10T10:00:00').getTime(), p1Name: '민수', p2Name: '지훈', p1Score: 11, p2Score: 7, winner: '민수' },
-      { id: '2', date: new Date('2024-03-12T14:30:00').getTime(), p1Name: '승우', p2Name: '윤희', p1Score: 8, p2Score: 11, winner: '윤희' },
-      { id: '3', date: new Date('2024-03-15T18:15:00').getTime(), p1Name: '승우', p2Name: '윤희', p1Score: 11, p2Score: 9, winner: '승우' },
-      { id: '4', date: new Date('2024-03-18T09:45:00').getTime(), p1Name: '준호', p2Name: '민석', p1Score: 11, p2Score: 4, winner: '준호' },
-      { id: '5', date: new Date('2024-03-20T16:20:00').getTime(), p1Name: '도윤', p2Name: '태민', p1Score: 12, p2Score: 14, winner: '태민' },
-    ];
+    return [];
   });
 
   useEffect(() => {
