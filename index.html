@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>sw 탁구 - 스코어보드</title>
     <!-- Tailwind CSS Play CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -14,6 +14,7 @@
         body {
             font-family: 'Inter', sans-serif;
             -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
         .tabular-nums {
             font-variant-numeric: tabular-nums;
@@ -21,6 +22,12 @@
         select {
             appearance: none;
             background-image: none;
+            font-size: 16px !important; /* Prevent zoom on focus */
+        }
+        /* Use dynamic viewport height for mobile browsers */
+        .h-safe-screen {
+            height: 100vh;
+            height: 100dvh;
         }
         /* Hide scrollbar for Chrome, Safari and Opera */
         .no-scrollbar::-webkit-scrollbar {
@@ -33,7 +40,7 @@
         }
     </style>
 </head>
-<body class="bg-white text-[#161616] h-screen overflow-hidden">
+<body class="bg-white text-[#161616] h-safe-screen overflow-hidden">
     <div id="app" class="flex flex-col h-full">
         <!-- Header -->
         <header class="flex justify-between items-center px-4 h-12 w-full shrink-0 bg-white border-b border-[#e0e0e0] z-50">

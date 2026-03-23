@@ -236,7 +236,7 @@ export default function App() {
   const isDeuce = p1Score >= 10 && p2Score >= 10 && p1Score === p2Score;
 
   return (
-    <div className="flex flex-col h-screen bg-white text-[#161616] font-sans overflow-hidden">
+    <div className="flex flex-col h-[100dvh] bg-white text-[#161616] font-sans overflow-hidden touch-manipulation">
       {/* Header */}
       <header className="flex justify-between items-center px-4 h-12 w-full shrink-0 bg-white border-b border-[#e0e0e0] z-50">
         <div className="flex items-center gap-3">
@@ -274,7 +274,7 @@ export default function App() {
                 <select 
                   value={p1Name}
                   onChange={(e) => setP1Name(e.target.value)}
-                  className="bg-transparent border-none text-[#525252] font-semibold text-sm tracking-widest uppercase focus:ring-0 w-32 pointer-events-auto outline-none cursor-pointer"
+                  className="bg-transparent border-none text-[#525252] font-semibold text-base tracking-widest uppercase focus:ring-0 w-32 pointer-events-auto outline-none cursor-pointer"
                   onClick={(e) => e.stopPropagation()}
                 >
                   {PLAYERS.filter(p => p !== p2Name || p === p1Name).map(p => (
@@ -319,7 +319,7 @@ export default function App() {
                 <select 
                   value={p2Name}
                   onChange={(e) => setP2Name(e.target.value)}
-                  className="bg-transparent border-none text-[#525252] font-semibold text-sm tracking-widest uppercase focus:ring-0 w-32 pointer-events-auto outline-none cursor-pointer"
+                  className="bg-transparent border-none text-[#525252] font-semibold text-base tracking-widest uppercase focus:ring-0 w-32 pointer-events-auto outline-none cursor-pointer"
                   onClick={(e) => e.stopPropagation()}
                 >
                   {PLAYERS.filter(p => p !== p1Name || p === p2Name).map(p => (
