@@ -22,3 +22,11 @@ export default defineConfig(({mode}) => {
     },
   };
 });
+// vite.config.ts 예시
+import { defineConfig } from 'vite'
+import react from '@vitejs/react-refresh'
+
+export default defineConfig({
+  plugins: [react()],
+  base: './', // 이 부분을 추가해야 경로 에러가 안 납니다.
+})
