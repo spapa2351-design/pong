@@ -1,13 +1,406 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Google AI Studio App</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>sw 탁구 - 스코어보드</title>
+    <!-- Tailwind CSS Play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .tabular-nums {
+            font-variant-numeric: tabular-nums;
+        }
+        select {
+            appearance: none;
+            background-image: none;
+        }
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+    </style>
+</head>
+<body class="bg-white text-[#161616] h-screen overflow-hidden">
+    <div id="app" class="flex flex-col h-full">
+        <!-- Header -->
+        <header class="flex justify-between items-center px-4 h-12 w-full shrink-0 bg-white border-b border-[#e0e0e0] z-50">
+            <div class="flex items-center gap-3">
+                <i data-lucide="trophy" class="w-5 h-5 text-[#0f62fe]"></i>
+                <h1 class="font-semibold text-base tracking-tight">sw 탁구</h1>
+            </div>
+            <div id="header-actions" class="flex items-center gap-2">
+                <!-- Actions will be injected here -->
+            </div>
+        </header>
 
+        <!-- Main Content -->
+        <main id="main-content" class="flex-1 relative overflow-hidden flex flex-col">
+            <!-- Content will be injected here -->
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="shrink-0 w-full flex justify-around items-center h-14 bg-white border-t border-[#e0e0e0] z-50">
+            <button id="nav-scoreboard" class="flex flex-col items-center justify-center flex-1 h-full rounded-none transition-colors text-[#0f62fe] border-t-2 border-[#0f62fe] pt-1 bg-[#f4f4f4]">
+                <i data-lucide="layout-dashboard" class="w-5 h-5 mb-0.5"></i>
+                <span class="text-[11px] font-semibold">점수판</span>
+            </button>
+            <button id="nav-history" class="flex flex-col items-center justify-center flex-1 h-full rounded-none transition-colors text-[#525252] pt-1 hover:bg-[#f4f4f4]">
+                <i data-lucide="history" class="w-5 h-5 mb-0.5"></i>
+                <span class="text-[11px] font-normal">기록</span>
+            </button>
+        </nav>
+    </div>
+
+    <script>
+        // --- Constants & State ---
+        const PLAYERS = ['CHAN', 'SEOUNGWOO', 'UNI'];
+        let state = {
+            activeTab: 'scoreboard',
+            p1Name: 'CHAN',
+            p2Name: 'SEOUNGWOO',
+            p1Score: 0,
+            p2Score: 0,
+            server: 1,
+            isGameOver: false,
+            winner: null,
+            matches: JSON.parse(localStorage.getItem('tableTennisMatches') || '[]')
+        };
+
+        // Fallback initial data if empty
+        if (state.matches.length === 0) {
+            state.matches = [
+                { id: '1', date: new Date('2024-03-10T10:00:00').getTime(), p1Name: '민수', p2Name: '지훈', p1Score: 11, p2Score: 7, winner: '민수' },
+                { id: '2', date: new Date('2024-03-12T14:30:00').getTime(), p1Name: '승우', p2Name: '윤희', p1Score: 8, p2Score: 11, winner: '윤희' },
+                { id: '3', date: new Date('2024-03-15T18:15:00').getTime(), p1Name: '승우', p2Name: '윤희', p1Score: 11, p2Score: 9, winner: '승우' }
+            ];
+            localStorage.setItem('tableTennisMatches', JSON.stringify(state.matches));
+        }
+
+        // --- TTS Logic ---
+        let speakTimeout = null;
+        let currentUtterance = null;
+
+        function speak(text) {
+            if (!('speechSynthesis' in window)) return;
+
+            if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+                window.speechSynthesis.cancel();
+            }
+            if (speakTimeout) clearTimeout(speakTimeout);
+
+            const wakeUpUtterance = new SpeechSynthesisUtterance('아');
+            wakeUpUtterance.volume = 0.01;
+            wakeUpUtterance.rate = 2;
+            window.speechSynthesis.speak(wakeUpUtterance);
+
+            speakTimeout = setTimeout(() => {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'ko-KR';
+                utterance.rate = 1.1;
+                utterance.pitch = 1;
+                utterance.volume = 1;
+
+                const voices = window.speechSynthesis.getVoices();
+                const koVoice = voices.find(v => v.lang.includes('ko') || v.lang.includes('KR'));
+                if (koVoice) utterance.voice = koVoice;
+
+                currentUtterance = utterance;
+                window.speechSynthesis.speak(utterance);
+            }, 600);
+        }
+
+        function announceScore(s1, s2, n1, n2) {
+            if (s1 === s2) {
+                if (s1 >= 10) speak('듀스!');
+                else speak(`${s1} 대 ${s2} 동점`);
+            } else if (s1 > s2) {
+                speak(`${n1} ${s1}점 대 ${n2} ${s2}점`);
+            } else {
+                speak(`${n2} ${s2}점 대 ${n1} ${s1}점`);
+            }
+        }
+
+        // --- Game Logic ---
+        function updateServer(s1, s2) {
+            const totalPoints = s1 + s2;
+            if (s1 >= 10 && s2 >= 10) {
+                state.server = (totalPoints % 2 === 0) ? 1 : 2;
+            } else {
+                state.server = (Math.floor(totalPoints / 2) % 2 === 0) ? 1 : 2;
+            }
+        }
+
+        function checkWinner(s1, s2) {
+            if ((s1 >= 11 || s2 >= 11) && Math.abs(s1 - s2) >= 2) {
+                state.isGameOver = true;
+                const winnerName = s1 > s2 ? state.p1Name : state.p2Name;
+                state.winner = winnerName;
+
+                const newMatch = {
+                    id: Date.now().toString(),
+                    date: Date.now(),
+                    p1Name: state.p1Name,
+                    p2Name: state.p2Name,
+                    p1Score: s1,
+                    p2Score: s2,
+                    winner: winnerName
+                };
+
+                state.matches = [newMatch, ...state.matches];
+                localStorage.setItem('tableTennisMatches', JSON.stringify(state.matches));
+
+                speak(`경기가 종료되었습니다. ${winnerName} 선수가 승리했습니다.`);
+                return true;
+            }
+            return false;
+        }
+
+        function incrementScore(player) {
+            if (state.isGameOver) return;
+            if (player === 1) state.p1Score++;
+            else state.p2Score++;
+
+            updateServer(state.p1Score, state.p2Score);
+            const isWin = checkWinner(state.p1Score, state.p2Score);
+            if (!isWin) {
+                announceScore(state.p1Score, state.p2Score, state.p1Name, state.p2Name);
+            }
+            render();
+        }
+
+        function decrementScore(player) {
+            if (state.isGameOver) return;
+            if (player === 1 && state.p1Score > 0) state.p1Score--;
+            else if (player === 2 && state.p2Score > 0) state.p2Score--;
+            else return;
+
+            updateServer(state.p1Score, state.p2Score);
+            announceScore(state.p1Score, state.p2Score, state.p1Name, state.p2Name);
+            render();
+        }
+
+        function resetGame() {
+            state.p1Score = 0;
+            state.p2Score = 0;
+            state.isGameOver = false;
+            state.winner = null;
+            state.server = 1;
+            speak("경기를 초기화합니다.");
+            render();
+        }
+
+        function deleteMatch(id) {
+            state.matches = state.matches.filter(m => m.id !== id);
+            localStorage.setItem('tableTennisMatches', JSON.stringify(state.matches));
+            render();
+        }
+
+        function calculateRankings() {
+            const statsMap = new Map();
+            state.matches.forEach(m => {
+                if (!statsMap.has(m.p1Name)) statsMap.set(m.p1Name, { wins: 0, total: 0 });
+                if (!statsMap.has(m.p2Name)) statsMap.set(m.p2Name, { wins: 0, total: 0 });
+                statsMap.get(m.p1Name).total++;
+                statsMap.get(m.p2Name).total++;
+                statsMap.get(m.winner).wins++;
+            });
+
+            return Array.from(statsMap.entries()).map(([name, stats]) => ({
+                name,
+                wins: stats.wins,
+                totalMatches: stats.total,
+                winRate: (stats.wins / stats.total) * 100
+            })).sort((a, b) => {
+                if (b.winRate !== a.winRate) return b.winRate - a.winRate;
+                return b.totalMatches - a.totalMatches;
+            }).slice(0, 3);
+        }
+
+        // --- Rendering ---
+        function render() {
+            const main = document.getElementById('main-content');
+            const headerActions = document.getElementById('header-actions');
+            const navScoreboard = document.getElementById('nav-scoreboard');
+            const navHistory = document.getElementById('nav-history');
+
+            // Update Nav Classes
+            if (state.activeTab === 'scoreboard') {
+                navScoreboard.className = "flex flex-col items-center justify-center flex-1 h-full rounded-none transition-colors text-[#0f62fe] border-t-2 border-[#0f62fe] pt-1 bg-[#f4f4f4]";
+                navHistory.className = "flex flex-col items-center justify-center flex-1 h-full rounded-none transition-colors text-[#525252] pt-1 hover:bg-[#f4f4f4]";
+            } else {
+                navScoreboard.className = "flex flex-col items-center justify-center flex-1 h-full rounded-none transition-colors text-[#525252] pt-1 hover:bg-[#f4f4f4]";
+                navHistory.className = "flex flex-col items-center justify-center flex-1 h-full rounded-none transition-colors text-[#0f62fe] border-t-2 border-[#0f62fe] pt-1 bg-[#f4f4f4]";
+            }
+
+            // Header Actions
+            headerActions.innerHTML = state.activeTab === 'scoreboard' 
+                ? `<button onclick="resetGame()" class="p-2 text-[#525252] hover:bg-[#e5e5e5] transition-colors rounded-none"><i data-lucide="rotate-ccw" class="w-5 h-5"></i></button>`
+                : `<button class="p-2 text-[#525252] hover:bg-[#e5e5e5] transition-colors rounded-none"><i data-lucide="search" class="w-5 h-5"></i></button>`;
+
+            if (state.activeTab === 'scoreboard') {
+                const isDeuce = state.p1Score >= 10 && state.p2Score >= 10 && state.p1Score === state.p2Score;
+                
+                main.innerHTML = `
+                    <div class="flex-1 flex flex-col landscape:flex-row relative">
+                        <!-- Player 1 -->
+                        <section class="flex-1 relative flex flex-col items-center justify-center bg-white select-none cursor-pointer" onclick="incrementScore(1)" oncontextmenu="event.preventDefault(); decrementScore(1);">
+                            <div class="absolute top-4 w-full px-6 flex justify-between items-center pointer-events-none">
+                                <select onchange="state.p1Name = this.value; render();" onclick="event.stopPropagation()" class="bg-transparent border-none text-[#525252] font-semibold text-sm tracking-widest uppercase focus:ring-0 w-32 pointer-events-auto outline-none cursor-pointer">
+                                    ${PLAYERS.filter(p => p !== state.p2Name || p === state.p1Name).map(p => `<option value="${p}" ${p === state.p1Name ? 'selected' : ''}>${p}</option>`).join('')}
+                                </select>
+                                <div class="text-[#0f62fe] transition-opacity duration-200 ${state.server === 1 ? 'opacity-100' : 'opacity-0'}">
+                                    <i data-lucide="circle" class="w-4 h-4 fill-current"></i>
+                                </div>
+                            </div>
+                            <div class="text-[clamp(6rem,25vmin,18rem)] leading-none font-semibold tabular-nums tracking-tighter">${state.p1Score}</div>
+                            <div class="absolute bottom-6 flex gap-8 pointer-events-none">
+                                <button onclick="event.stopPropagation(); decrementScore(1);" class="w-12 h-12 flex items-center justify-center bg-[#e0e0e0] border border-[#d1d1d1] text-[#161616] pointer-events-auto active:bg-[#c6c6c6] rounded-none transition-colors"><i data-lucide="minus" class="w-6 h-6"></i></button>
+                                <button onclick="event.stopPropagation(); incrementScore(1);" class="w-12 h-12 flex items-center justify-center bg-[#0f62fe] text-white pointer-events-auto active:bg-[#0043ce] rounded-none transition-colors"><i data-lucide="plus" class="w-6 h-6"></i></button>
+                            </div>
+                        </section>
+
+                        <div class="h-[1px] w-full landscape:w-[1px] landscape:h-full bg-[#e0e0e0] z-10 shrink-0"></div>
+
+                        <!-- Player 2 -->
+                        <section class="flex-1 relative flex flex-col items-center justify-center bg-[#f4f4f4] select-none cursor-pointer" onclick="incrementScore(2)" oncontextmenu="event.preventDefault(); decrementScore(2);">
+                            <div class="absolute top-4 w-full px-6 flex justify-between items-center pointer-events-none">
+                                <select onchange="state.p2Name = this.value; render();" onclick="event.stopPropagation()" class="bg-transparent border-none text-[#525252] font-semibold text-sm tracking-widest uppercase focus:ring-0 w-32 pointer-events-auto outline-none cursor-pointer">
+                                    ${PLAYERS.filter(p => p !== state.p1Name || p === state.p2Name).map(p => `<option value="${p}" ${p === state.p2Name ? 'selected' : ''}>${p}</option>`).join('')}
+                                </select>
+                                <div class="text-[#0f62fe] transition-opacity duration-200 ${state.server === 2 ? 'opacity-100' : 'opacity-0'}">
+                                    <i data-lucide="circle" class="w-4 h-4 fill-current"></i>
+                                </div>
+                            </div>
+                            <div class="text-[clamp(6rem,25vmin,18rem)] leading-none font-semibold tabular-nums tracking-tighter">${state.p2Score}</div>
+                            <div class="absolute bottom-6 flex gap-8 pointer-events-none">
+                                <button onclick="event.stopPropagation(); decrementScore(2);" class="w-12 h-12 flex items-center justify-center bg-[#e0e0e0] border border-[#d1d1d1] text-[#161616] pointer-events-auto active:bg-[#c6c6c6] rounded-none transition-colors"><i data-lucide="minus" class="w-6 h-6"></i></button>
+                                <button onclick="event.stopPropagation(); incrementScore(2);" class="w-12 h-12 flex items-center justify-center bg-[#0f62fe] text-white pointer-events-auto active:bg-[#0043ce] rounded-none transition-colors"><i data-lucide="plus" class="w-6 h-6"></i></button>
+                            </div>
+                        </section>
+
+                        ${isDeuce ? `<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 bg-[#da1e28] px-4 py-1 text-white font-bold text-xs tracking-tighter uppercase animate-pulse">듀스</div>` : ''}
+
+                        ${state.isGameOver && state.winner ? `
+                            <div class="absolute inset-0 z-50 flex items-center justify-center bg-[#161616]/80 backdrop-blur-sm">
+                                <div class="bg-white p-8 flex flex-col items-center gap-4 min-w-[320px] shadow-2xl">
+                                    <div class="w-16 h-16 bg-[#e0e0e0] rounded-full flex items-center justify-center mb-2"><i data-lucide="trophy" class="w-8 h-8 text-[#0f62fe]"></i></div>
+                                    <h2 class="text-3xl font-bold tracking-tight text-[#161616] text-center">${state.winner} 승리!</h2>
+                                    <p class="text-[#525252] text-xl font-semibold tabular-nums mb-4">${state.p1Score} : ${state.p2Score}</p>
+                                    <button onclick="resetGame()" class="w-full py-4 bg-[#0f62fe] text-white text-lg font-semibold hover:bg-[#0043ce] active:bg-[#002d9c] transition-colors flex items-center justify-center gap-2">
+                                        <i data-lucide="rotate-ccw" class="w-5 h-5"></i> 다시하기
+                                    </button>
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            } else {
+                const rankings = calculateRankings();
+                main.innerHTML = `
+                    <div class="flex-1 overflow-y-auto pb-20 bg-white no-scrollbar">
+                        <div class="px-4 py-6 max-w-2xl mx-auto">
+                            <!-- Rankings -->
+                            <div class="mb-10">
+                                <div class="flex justify-between items-baseline mb-4 border-b border-[#e0e0e0] pb-2">
+                                    <h2 class="text-xl font-normal tracking-tight text-[#161616]">랭킹 보드</h2>
+                                    <span class="text-[11px] font-medium text-[#525252] uppercase tracking-widest">Win Rate</span>
+                                </div>
+                                <div class="bg-[#f4f4f4] border border-[#e0e0e0] p-4 flex flex-col gap-4">
+                                    ${rankings.map((p, i) => `
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-8 h-8 flex items-center justify-center font-bold text-sm ${i === 0 ? 'bg-[#0f62fe] text-white' : i === 1 ? 'bg-[#c6c6c6] text-[#161616]' : 'bg-[#e0e0e0] text-[#161616]'}">${ i + 1 }</div>
+                                                <span class="text-sm font-semibold">${p.name}</span>
+                                            </div>
+                                            <div class="flex flex-col items-end">
+                                                <div class="flex items-center gap-2 text-[11px] text-[#525252] mb-1">
+                                                    <span>경기수: ${p.totalMatches}</span> | <span>승리: ${p.wins}</span> | <span>패배: ${p.totalMatches - p.wins}</span>
+                                                </div>
+                                                <div class="flex items-center gap-1.5">
+                                                    <span class="text-xs text-[#525252]">승률</span>
+                                                    <span class="text-sm font-semibold">${p.winRate.toFixed(1)}%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                    ${rankings.length === 0 ? '<div class="text-center text-sm text-[#525252] py-4">기록이 없습니다.</div>' : ''}
+                                </div>
+                            </div>
+
+                            <!-- History -->
+                            <div>
+                                <div class="flex justify-between items-baseline mb-4 border-b border-[#e0e0e0] pb-2">
+                                    <h2 class="text-2xl font-normal tracking-tight text-[#161616]">경기 기록</h2>
+                                    <span class="text-[11px] font-medium text-[#525252] uppercase tracking-widest">Ascending</span>
+                                </div>
+                                <div class="flex flex-col gap-[1px] bg-[#e0e0e0] border border-[#e0e0e0]">
+                                    ${state.matches.map(m => `
+                                        <div class="bg-white p-4 flex flex-col gap-3 group hover:bg-[#f4f4f4] transition-colors relative">
+                                            <div class="flex justify-between items-center">
+                                                <span class="text-xs font-normal text-[#525252]">${new Date(m.date).toLocaleDateString()}</span>
+                                                <div class="flex items-center gap-2">
+                                                    <div class="bg-[#a7f0ba] text-[#044317] text-[11px] px-2 py-0.5 font-medium uppercase">${m.winner} 승리</div>
+                                                    <button onclick="deleteMatch('${m.id}')" class="text-[#da1e28] hover:bg-[#fff1f1] p-1 transition-colors"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
+                                                </div>
+                                            </div>
+                                            <div class="flex justify-between items-center">
+                                                <div class="flex flex-col">
+                                                    <span class="text-sm ${m.p1Name === m.winner ? 'font-semibold text-[#0f62fe]' : 'text-[#161616]'}">${m.p1Name}</span>
+                                                    <span class="text-sm ${m.p2Name === m.winner ? 'font-semibold text-[#0f62fe]' : 'text-[#161616]'}">${m.p2Name}</span>
+                                                </div>
+                                                <div class="flex items-center gap-4">
+                                                    <div class="flex flex-col items-end">
+                                                        <span class="text-xl tracking-tighter ${m.p1Score > m.p2Score ? 'font-semibold text-[#161616]' : 'font-normal text-[#8d8d8d]'}">${m.p1Score}</span>
+                                                        <span class="text-xl tracking-tighter ${m.p2Score > m.p1Score ? 'font-semibold text-[#161616]' : 'font-normal text-[#8d8d8d]'}">${m.p2Score}</span>
+                                                    </div>
+                                                    <i data-lucide="chevron-right" class="w-6 h-6 text-[#8d8d8d]"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                    ${state.matches.length === 0 ? '<div class="bg-white p-8 text-center text-sm text-[#525252]">저장된 경기 기록이 없습니다.</div>' : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Initialize Lucide Icons
+            lucide.createIcons();
+        }
+
+        // --- Event Listeners ---
+        document.getElementById('nav-scoreboard').addEventListener('click', () => {
+            state.activeTab = 'scoreboard';
+            render();
+        });
+        document.getElementById('nav-history').addEventListener('click', () => {
+            state.activeTab = 'history';
+            render();
+        });
+
+        // Initial Render
+        render();
+
+        // Initialize voices
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.getVoices();
+            window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+        }
+    </script>
+</body>
+</html>
