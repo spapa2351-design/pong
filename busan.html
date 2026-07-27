@@ -3,214 +3,198 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>부산 2박 3일 가족 여행 가이드 (B안)</title>
+    <title>부산 2박 3일 가족 여행 가이드 (해운대센트럴호텔 기준)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap');
         
         body {
-            font-family: 'Noto Sans KR', sans-serif;
-            background-color: #fdfaf6;
-            color: #444;
+            font-family: 'Pretendard', sans-serif;
+            background-color: #f9fafb;
+            color: #1f2937;
         }
 
         .chart-container {
             position: relative;
             width: 100%;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 300px;
-            max-height: 400px;
-        }
-
-        @media (min-width: 768px) {
-            .chart-container {
-                height: 350px;
-            }
+            max-width: 500px;
+            margin: 0 auto;
+            height: 250px;
         }
 
         .tab-active {
-            border-bottom: 3px solid #7c2d12;
-            color: #7c2d12;
-            font-weight: 700;
+            background-color: #1e40af;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .step-card:hover {
+            border-left: 4px solid #1e40af;
+            background-color: #f3f4f6;
         }
 
         .fade-in {
-            animation: fadeIn 0.5s ease-in;
+            animation: fadeIn 0.4s ease-out;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
-        }
-
-        .map-link:hover {
-            text-decoration: underline;
-            color: #2563eb;
         }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="pb-10">
 
-    <div class="max-w-4xl mx-auto">
+    <div class="max-w-md mx-auto bg-white min-h-screen shadow-xl overflow-hidden">
         <!-- Header -->
-        <header class="text-center mb-10">
-            <h1 class="text-3xl md:text-4xl font-bold text-amber-900 mb-2">👨‍👩‍👧 부산 2박 3일 가족 여행</h1>
-            <p class="text-amber-700 italic">액티비티 & 맛집 집중 코스 (B안)</p>
+        <header class="bg-blue-900 text-white p-6 pt-10">
+            <h1 class="text-2xl font-bold mb-1">🌊 부산 가족 여행 스마트 가이드</h1>
+            <p class="text-blue-200 text-sm">해운대센트럴호텔 투숙 기준 B안</p>
         </header>
 
-        <!-- Intro Section -->
-        <section class="bg-white p-6 rounded-2xl shadow-sm mb-8 border border-amber-100">
-            <h2 class="text-xl font-bold mb-3 text-amber-900">🧭 여행 개요 및 가이드 안내</h2>
-            <p class="leading-relaxed mb-4">
-                이 가이드는 10살 아이와 함께하는 부산 여행을 가장 효율적이고 즐겁게 즐길 수 있도록 설계되었습니다. 
-                <strong>대중교통</strong> 이동을 원칙으로 하며, 짐캐리 서비스를 활용해 두 손 자유로운 여행을 제안합니다. 
-                아래 탭을 클릭하여 일자별 상세 일정을 확인하고, 지도 링크를 통해 실제 위치를 바로 확인해 보세요.
-            </p>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-amber-50 p-4 rounded-lg">
-                    <p class="font-bold text-amber-800">💡 핵심 팁</p>
-                    <ul class="text-sm list-disc ml-4 mt-1">
-                        <li>부산역 '짐캐리'를 활용해 캐리어를 숙소로 바로 보내세요.</li>
-                        <li>해운대 스카이캡슐은 2~3주 전 사전 예약이 필수입니다.</li>
-                        <li>이재모피자는 대기가 기니 도착 즉시 '캐치테이블'을 확인하세요.</li>
-                    </ul>
+        <!-- Briefing Section -->
+        <section class="p-5 border-b border-gray-100">
+            <div class="flex items-center space-x-3 mb-4">
+                <div class="bg-blue-100 p-2 rounded-full text-blue-800">🏨</div>
+                <div>
+                    <h2 class="text-sm font-bold">내 숙소 위치</h2>
+                    <a href="https://map.naver.com/p/entry/place/1572974776" target="_blank" class="text-xs text-blue-600 underline">해운대센트럴호텔 지도보기</a>
                 </div>
-                <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
-                    <p class="font-bold text-blue-800">📊 일정 성격 분석</p>
-                    <div class="chart-container">
-                        <canvas id="typeChart"></canvas>
-                    </div>
-                </div>
+            </div>
+            
+            <div class="bg-yellow-50 p-4 rounded-xl border border-yellow-100">
+                <p class="text-xs font-bold text-yellow-800 mb-1">📢 여행 핵심 요약</p>
+                <ul class="text-[11px] text-yellow-900 space-y-1 list-disc ml-3">
+                    <li><b>짐캐리:</b> 부산역 도착 즉시 호텔로 캐리어 배송 (두 손 자유)</li>
+                    <li><b>이재모피자:</b> 남포동 도착 즉시 '캐치테이블' 웨이팅 확인 필수</li>
+                    <li><b>해변열차:</b> 2일차 16:00 청사포 출발 예약 (15:20 호텔 출발 권장)</li>
+                </ul>
             </div>
         </section>
 
-        <!-- Navigation Tabs -->
-        <nav class="flex justify-center space-x-4 mb-6 border-b border-gray-200">
-            <button onclick="switchDay(1)" id="tab1" class="px-6 py-2 transition-all tab-active">1일 차</button>
-            <button onclick="switchDay(2)" id="tab2" class="px-6 py-2 transition-all">2일 차</button>
-            <button onclick="switchDay(3)" id="tab3" class="px-6 py-2 transition-all">3일 차</button>
+        <!-- Summary Chart Section -->
+        <section class="p-5 bg-gray-50">
+            <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">여행 밸런스 분석</h3>
+            <div class="chart-container">
+                <canvas id="travelChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Tab Navigation -->
+        <nav class="flex p-2 bg-gray-100 mx-5 my-4 rounded-xl space-x-1">
+            <button onclick="switchDay(1)" id="tab1" class="flex-1 py-2 text-sm rounded-lg transition-all tab-active font-semibold">Day 1</button>
+            <button onclick="switchDay(2)" id="tab2" class="flex-1 py-2 text-sm rounded-lg transition-all text-gray-500">Day 2</button>
+            <button onclick="switchDay(3)" id="tab3" class="flex-1 py-2 text-sm rounded-lg transition-all text-gray-500">Day 3</button>
         </nav>
 
-        <!-- Content Area -->
-        <main id="schedule-content" class="fade-in">
-            <!-- Content will be injected by JavaScript -->
+        <!-- Main Schedule Content -->
+        <main id="schedule-area" class="px-5 space-y-4">
+            <!-- JS will inject content here -->
         </main>
-
-        <!-- Bottom Legend -->
-        <footer class="mt-12 pt-8 border-t border-gray-200 text-center text-gray-500 text-sm">
-            <p>본 일정은 대중교통 이용 기준이며, 현지 상황에 따라 소요 시간이 달라질 수 있습니다.</p>
-            <p class="mt-2">© 2024 Busan Family Travel Guide (Plan B)</p>
-        </footer>
     </div>
 
     <script>
         const travelData = {
             1: {
-                title: "영도 바다 & 남포동 정복",
-                intro: "여행 첫날은 영도의 절경과 부산의 전통적인 먹거리를 즐기는 날입니다. 부산역 도착 직후 짐을 숙소로 보내고, 가벼운 몸으로 태종대의 바다와 남포동의 활기를 느껴보세요.",
-                steps: [
-                    { time: "10:30", action: "부산역 도착", loc: "부산역", url: "https://map.naver.com/v5/search/부산역" },
-                    { time: "10:40", action: "🍲 점심 (돼지국밥)", loc: "본전돼지국밥", url: "https://map.naver.com/v5/search/부산역%20본전돼지국밥" },
-                    { time: "11:30", action: "🧳 짐 배송 접수", loc: "짐캐리 부산역점", url: "https://map.naver.com/v5/search/짐캐리%20부산역점" },
-                    { time: "13:00", action: "🌲 태종대 관람 (다누비 열차)", loc: "태종대유원지", url: "https://map.naver.com/v5/search/태종대유원지" },
-                    { time: "16:10", action: "🍕 저녁: 이재모피자 본점", loc: "이재모피자 본점", url: "https://map.naver.com/v5/search/이재모피자%20본점" },
-                    { time: "17:30", action: "🍢 부평깡통시장 구경", loc: "부평깡통시장", url: "https://map.naver.com/v5/search/부평깡통시장" },
-                    { time: "20:00", action: "🏨 해운대 숙소 체크인", loc: "해운대 숙소", url: "https://map.naver.com/v5/search/해운대해수욕장" }
+                title: "영도 & 남포동 코스",
+                desc: "부산역 도착 후 두 손 가볍게 태종대의 절경과 남포동의 로컬 맛집을 정복하는 날입니다.",
+                items: [
+                    { time: "10:30", act: "🚆 부산역 도착", loc: "부산역", url: "https://map.naver.com/v5/search/%EB%B6%80%EC%82%B0%EC%97%AD" },
+                    { time: "10:45", act: "🍲 점심 (본전돼지국밥)", loc: "본전돼지국밥", url: "https://map.naver.com/v5/search/%EB%B3%B8%EC%A0%84%EB%8F%BC%EC%A7%80%EA%B5%AD%EB%B0%A5" },
+                    { time: "11:40", act: "🧳 짐 배송 접수", loc: "짐캐리 부산역점", url: "https://map.naver.com/v5/search/%EC%A7%90%EC%BA%AC%EB%A6%AC%20%EB%B6%80%EC%82%B0%EC%97%AD%EC%A0%90" },
+                    { time: "13:00", act: "🌲 태종대 관람 (다누비 열차)", loc: "태종대 유원지", url: "https://map.naver.com/v5/search/%ED%83%9C%EC%A2%85%EB%8C%80%EC%9C%A0%EC%9B%90%EC%A7%80" },
+                    { time: "16:10", act: "🍕 저녁: 이재모피자 본점", loc: "이재모피자", url: "https://map.naver.com/v5/search/%EC%9D%B4%EC%9E%AC%EB%AA%A8%ED%94%BC%EC%9E%90%20%EB%B3%B8%EC%A0%90" },
+                    { time: "17:30", act: "🍢 부평깡통시장 구경", loc: "부평깡통시장", url: "https://map.naver.com/v5/search/%EB%B6%80%ED%8F%89%EA%B9%A1%ED%86%B5%EC%8B%9C%EC%9E%A5" },
+                    { time: "20:00", act: "🏨 숙소 체크인", loc: "해운대센트럴호텔", url: "https://map.naver.com/p/entry/place/1572974776" }
                 ]
             },
             2: {
-                title: "해수욕 & 청사포 낭만 & 야경",
-                intro: "둘째 날은 해운대에서 충분한 해수욕을 즐기고, 최근 가장 핫한 해안 열차와 청사포의 낭만을 만끽합니다. 광안대교의 야경으로 하루를 화려하게 마무리합니다.",
-                steps: [
-                    { time: "09:30", action: "🏖️ 해운대 해수욕 즐기기", loc: "해운대해수욕장", url: "https://map.naver.com/v5/search/해운대해수욕장" },
-                    { time: "16:00", action: "🚠 스카이캡슐 탑승", loc: "미포 정거장", url: "https://map.naver.com/v5/search/해운대블루라인파크%20미포정거장" },
-                    { time: "16:30", action: "📸 청사포 인증샷 & 카페", loc: "청사포 건널목", url: "https://map.naver.com/v5/search/청사포%20건널목" },
-                    { time: "18:30", action: "✨ 광안리 해변 & 저녁", loc: "광안리해수욕장", url: "https://map.naver.com/v5/search/광안리해수욕장" },
-                    { time: "20:30", action: "🚇 해운대 복귀", loc: "해운대역", url: "https://map.naver.com/v5/search/해운대역%202호선" }
+                title: "해수욕 & 해변열차 & 야경",
+                desc: "오전은 호텔 앞 바다에서 해수욕을 즐기고, 오후에는 청사포의 낭만과 광안리 야경을 만끽합니다.",
+                items: [
+                    { time: "09:30", act: "🏖️ 해운대 해수욕 즐기기", loc: "호텔 앞 해변", url: "https://map.naver.com/v5/search/%ED%95%B4%EC%9A%B4%EB%8C%80%ED%95%B4%EC%82%AC%EC%9E%A5" },
+                    { time: "14:00", act: "🚿 해수욕 마무리 및 샤워", loc: "호텔 복귀", url: "https://map.naver.com/p/entry/place/1572974776" },
+                    { time: "15:20", act: "🚌 청사포로 이동 (마을버스/택시)", loc: "호텔 앞 출발", url: "https://map.naver.com/p/directions/14376918.4284523,4185038.9918732,%ED%95%B4%EC%9A%B4%EB%8C%80%EC%84%BC%ED%8A%B8%EB%9F%B4%ED%98%B8%ED%85%94,1572974776,PLACE_POI/14380816.9234851,4184699.2731057,%EC%B2%AD%EC%82%AC%ED%8F%AC%EC%A0%95%EA%B1%B0%EC%9E%A5,1166699299,PLACE_POI/-/transit?c=14.00,0,0,0,dh" },
+                    { time: "16:00", act: "🚂 해변열차 탑승 (청사포역)", loc: "청사포 정거장", url: "https://map.naver.com/v5/search/%EC%B2%AD%EC%82%AC%ED%8F%AC%20%EC%A0%95%EA%B1%B0%EC%9E%A5" },
+                    { time: "16:40", act: "📸 철도건널목 인증샷", loc: "청사포 건널목", url: "https://map.naver.com/v5/search/%EC%B2%AD%EC%82%AC%ED%8F%AC%20%EA%B1%B4%EB%84%90%EB%목" },
+                    { time: "18:30", act: "✨ 광안리 야경 & 저녁", loc: "광안리 해수욕장", url: "https://map.naver.com/v5/search/%EA%B4%91%EC%95%88%EB%A6%AC%ED%95%B4%EC%82%AC%EC%9E%A5" },
+                    { time: "20:30", act: "🚇 숙소 복귀", loc: "해운대센트럴호텔", url: "https://map.naver.com/p/entry/place/1572974776" }
                 ]
             },
             3: {
                 title: "여유로운 마무리",
-                intro: "마지막 날은 복잡한 일정 대신 여유로운 산책과 맛있는 식사로 여행을 정리합니다. 동백섬의 공기를 마시며 부산의 마지막 모습을 담아보세요.",
-                steps: [
-                    { time: "10:00", action: "🏨 체크아웃 & 산책", loc: "동백섬", url: "https://map.naver.com/v5/search/동백섬" },
-                    { time: "12:30", action: "🥟 점심: 차이나타운", loc: "초량 차이나타운", url: "https://map.naver.com/v5/search/초량%20차이나타운" },
-                    { time: "14:00", action: "🚄 KTX 탑승 및 귀가", loc: "부산역", url: "https://map.naver.com/v5/search/부산역" }
+                desc: "마지막 날은 동백섬 산책으로 마무리하고, 부산역 근처에서 맛있는 식사 후 귀가합니다.",
+                items: [
+                    { time: "10:00", act: "🏨 체크아웃", loc: "호텔 로비", url: "https://map.naver.com/p/entry/place/1572974776" },
+                    { time: "10:30", act: "🚶‍♂️ 동백섬 해안산책", loc: "동백섬", url: "https://map.naver.com/v5/search/%EB%8F%99%EB%B0%B1%EC%84%AC" },
+                    { time: "12:30", act: "🥟 점심 (차이나타운 만두)", loc: "초량 차이나타운", url: "https://map.naver.com/v5/search/%EC%B4%88%EB%9F%89%20%EC%B0%A8%EC%9D%B4%EB%82%98%ED%83%80%EC%9A%B4" },
+                    { time: "14:00", act: "🚄 KTX 탑승 및 귀가", loc: "부산역", url: "https://map.naver.com/v5/search/%EB%B6%80%EC%82%B0%EC%97%AD" }
                 ]
             }
         };
 
         function switchDay(day) {
-            // Update Tabs
-            for (let i = 1; i <= 3; i++) {
-                document.getElementById(`tab${i}`).classList.remove('tab-active');
-            }
-            document.getElementById(`tab${day}`).classList.add('tab-active');
+            // Update Tab UI
+            document.querySelectorAll('nav button').forEach(btn => {
+                btn.classList.remove('tab-active', 'text-gray-500');
+                btn.classList.add('text-gray-500');
+            });
+            const activeTab = document.getElementById(`tab${day}`);
+            activeTab.classList.remove('text-gray-500');
+            activeTab.classList.add('tab-active');
 
             // Render Content
-            const content = document.getElementById('schedule-content');
+            const area = document.getElementById('schedule-area');
             const data = travelData[day];
             
             let html = `
-                <div class="mb-6">
-                    <h3 class="text-2xl font-bold text-amber-900 mb-2">${day}일 차: ${data.title}</h3>
-                    <p class="text-gray-600 leading-relaxed">${data.intro}</p>
+                <div class="mb-2 fade-in">
+                    <h4 class="text-lg font-bold text-blue-900">${day}일 차: ${data.title}</h4>
+                    <p class="text-xs text-gray-600 mt-1">${data.desc}</p>
                 </div>
-                <div class="space-y-4">
             `;
 
-            data.steps.forEach(step => {
+            data.items.forEach(item => {
                 html += `
-                    <div class="flex items-start bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                        <div class="min-w-[70px] text-amber-700 font-bold">${step.time}</div>
-                        <div class="flex-1 border-l-2 border-amber-100 pl-4 ml-2">
-                            <p class="text-lg font-semibold text-gray-800">${step.action}</p>
-                            <a href="${step.url}" target="_blank" class="text-sm text-blue-500 flex items-center mt-1 map-link">
-                                📍 ${step.loc} (지도보기)
+                    <div class="flex items-start bg-white p-3 rounded-xl border border-gray-100 shadow-sm step-card fade-in transition-all">
+                        <div class="w-12 text-[10px] font-bold text-blue-600 pt-1">${item.time}</div>
+                        <div class="flex-1 pl-3 border-l border-blue-50">
+                            <div class="text-sm font-semibold">${item.act}</div>
+                            <a href="${item.url}" target="_blank" class="text-[10px] text-gray-400 flex items-center mt-1">
+                                📍 ${item.loc} <span class="ml-1 text-blue-500 underline">(지도)</span>
                             </a>
                         </div>
                     </div>
                 `;
             });
 
-            html += `</div>`;
-            content.innerHTML = html;
-            
-            // Re-trigger animation
-            content.classList.remove('fade-in');
-            void content.offsetWidth; 
-            content.classList.add('fade-in');
+            area.innerHTML = html;
         }
 
         // Chart Initialization
         function initChart() {
-            const ctx = document.getElementById('typeChart').getContext('2d');
+            const ctx = document.getElementById('travelChart').getContext('2d');
             new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['활동/관광', '식사/카페', '휴식/해수욕', '이동'],
+                    labels: ['활동/관광', '미식/체험', '해수욕/휴식', '이동'],
                     datasets: [{
-                        data: [40, 30, 20, 10],
-                        backgroundColor: ['#7c2d12', '#fbbf24', '#fef3c7', '#d1d5db'],
-                        borderWidth: 0
+                        data: [35, 35, 20, 10],
+                        backgroundColor: ['#1e3a8a', '#fbbf24', '#bfdbfe', '#e5e7eb'],
+                        borderWidth: 0,
+                        hoverOffset: 10
                     }]
                 },
                 options: {
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: { boxWidth: 12, font: { size: 10 } }
-                        }
+                        legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } }
                     }
                 }
             });
         }
 
-        // Load Initial State
         window.onload = () => {
             switchDay(1);
             initChart();
