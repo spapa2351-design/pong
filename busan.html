@@ -97,16 +97,18 @@
     <script>
         const travelData = {
             1: {
-                title: "영도 & 남포동 코스",
-                desc: "부산역 도착 후 두 손 가볍게 태종대의 절경과 남포동의 로컬 맛집을 정복하는 날입니다.",
+                title: "남포동 & 영도 1006번 대교 투어",
+                desc: "남포동을 먼저 즐기고, 태종대에서 출발하는 '1006번 급행버스'로 부산항대교와 광안대교를 연속 횡단하는 가성비 최고 스릴 코스입니다.",
                 items: [
-                    { time: "10:30", act: "🚆 부산역 도착", loc: "부산역", url: "https://map.naver.com/v5/search/%EB%B6%80%EC%82%B0%EC%97%AD" },
-                    { time: "10:45", act: "🍲 점심 (본전돼지국밥)", loc: "본전돼지국밥", url: "https://map.naver.com/v5/search/%EB%B3%B8%EC%A0%84%EB%8F%BC%EC%A7%80%EA%B5%AD%EB%B0%A5" },
-                    { time: "11:40", act: "🧳 짐 배송 접수", loc: "짐캐리 부산역점", url: "https://map.naver.com/v5/search/%EC%A7%90%EC%BA%AC%EB%A6%AC%20%EB%B6%80%EC%82%B0%EC%97%AD%EC%A0%90" },
-                    { time: "13:00", act: "🌲 태종대 관람 (다누비 열차)", loc: "태종대 유원지", url: "https://map.naver.com/v5/search/%ED%83%9C%EC%A2%85%EB%8C%80%EC%9C%A0%EC%9B%90%EC%A7%80" },
-                    { time: "16:10", act: "🍕 저녁: 이재모피자 본점", loc: "이재모피자", url: "https://map.naver.com/v5/search/%EC%9D%B4%EC%9E%AC%EB%AA%A8%ED%94%BC%EC%9E%90%20%EB%B3%B8%EC%A0%90" },
-                    { time: "17:30", act: "🍢 부평깡통시장 구경", loc: "부평깡통시장", url: "https://map.naver.com/v5/search/%EB%B6%80%ED%8F%89%EA%B9%A1%ED%86%B5%EC%8B%9C%EC%9E%A5" },
-                    { time: "20:00", act: "🏨 숙소 체크인", loc: "해운대센트럴호텔", url: "https://map.naver.com/p/entry/place/1572974776" }
+                    { time: "10:30", act: "🧳 짐 배송 접수 (도착 직후)", loc: "짐캐리 부산역 1층", url: "https://map.naver.com/v5/search/%EC%A7%90%EC%BA%AC%EB%A6%AC%20%EB%B6%80%EC%82%B0%EC%97%AD%EC%A0%90" },
+                    { time: "10:50", act: "🍲 점심 (본전/신창 등 돼지국밥)", loc: "부산역 인근", url: "https://map.naver.com/v5/search/%EB%B6%80%EC%82%B0%EC%97%AD%20%EB%8F%BC%EC%A7%80%EA%B5%AD%EB%B0%A5" },
+                    { time: "12:00", act: "🚇 남포동으로 이동 & 이재모 대기", loc: "자갈치역/남포역", url: "https://map.naver.com/v5/search/%EC%9E%90%EA%B0%88%EC%B9%98%EC%97%AD" },
+                    { time: "12:20", act: "🍢 부평깡통시장 구경 (소화시키기)", loc: "부평깡통시장", url: "https://map.naver.com/v5/search/%EB%B6%80%ED%8F%89%EA%B9%A1%ED%86%B5%EC%8B%9C%EC%9E%A5" },
+                    { time: "13:30", act: "🍕 늦은 점심: 이재모피자 본점", loc: "이재모피자", url: "https://map.naver.com/v5/search/%EC%9D%B4%EC%9E%AC%EB%AA%A8%ED%94%BC%EC%9E%90%20%EB%B3%B8%EC%A0%90" },
+                    { time: "14:40", act: "🚌 태종대로 이동 (8, 30번 버스)", loc: "남포동 출발", url: "https://map.naver.com/p/directions/14362702.5085351,4177579.8654877,%EB%82%A8%ED%8F%AC%EB%8F%99,11400262,PLACE_POI/14369068.7303038,4172421.3789018,%ED%83%9C%EC%A2%85%EB%8C%80%EC%9C%A0%EC%9B%90%EC%A7%80,11571734,PLACE_POI/-/transit?c=13.00,0,0,0,dh" },
+                    { time: "15:20", act: "🌲 태종대 관람 (다누비 열차)", loc: "태종대 유원지", url: "https://map.naver.com/v5/search/%ED%83%9C%EC%A2%85%EB%8C%80%EC%9C%A0%EC%9B%90%EC%A7%80" },
+                    { time: "17:30", act: "🌉 [하이라이트] 1006번 버스 탑승", loc: "태종대 차고지(종점)", url: "https://map.naver.com/p/directions/14369068.7303038,4172421.3789018,%ED%83%9C%EC%A2%85%EB%8C%80%EC%9C%A0%EC%9B%90%EC%A7%80,11571734,PLACE_POI/14376510.6358327,4185072.0799793,%ED%95%B4%EC%9A%B4%EB%8C%80%EC%84%BC%ED%8A%B8%EB%9F%B4%ED%98%B8%ED%85%94,1572974776,PLACE_POI/-/transit?c=15.00,0,0,0,dh" },
+                    { time: "18:40", act: "🚇 숙소 앞 도착 및 체크인", loc: "해운대센트럴호텔", url: "https://map.naver.com/p/entry/place/1572974776" }
                 ]
             },
             2: {
